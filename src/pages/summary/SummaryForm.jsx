@@ -27,15 +27,17 @@ export default function SummaryForm() {
 
   return (
     <Form>
-        <input
+      <Form.Group controlId="terms-and-conditions">
+        <Form.Check
           type="checkbox"
           checked={tcChecked}
           onChange={(e) => setTcChecked(e.target.checked)}
           label={checkboxLabel}
         />
-      <button type="submit" disabled={!tcChecked}>
+      </Form.Group>
+      <Button variant="primary" type="submit" disabled={!tcChecked}>
         Confirm order
-      </button>
+      </Button>
     </Form>
   );
 }

@@ -21,7 +21,7 @@ test('checkbox toggles button', async () => {
 	expect(button.disabled).toBe(true);
 });
 
-test.skip('popover responds to hover', async () => {
+test('popover responds to hover', async () => {
 	const user = userEvent.setup();
 
 	render(<SummaryForm />);
