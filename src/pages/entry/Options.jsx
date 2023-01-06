@@ -3,37 +3,46 @@ import { useEffect, useState } from 'react';
 import ScoopOption from './ScoopOption';
 import Row from 'react-bootstrap/Row';
 import ToppingOption from './ToppingOption';
-import Alert from 'react-bootstrap/Alert';
+import AlertBanner from '../common/AlertBanner';
+import { pricePerItem } from '../../constants';
+import { formatCurrency } from '../../utilities';
+import { useOrderDetails } from '../../contexts/OrderDetails';
 
 export default function Options({ optionType }) {
-    const [items, setItems] = useState([]);
-    const [err, setErr] = useState(false);
+	const [items, setItems] = useState([]);
+	const [err, setErr] = useState(false);
+	const { totals } = useOrderDetails();
 
-    useEffect(() => {
-        axios.get(`http://localhost:3030/${optionType}`)
-           .then(res => {
-               setItems(res.data);
-               if (err) {
-                   setErr(false);
-               }
-        })
-           .catch(err => setErr(true));
-    }, [optionType, err]);
+	useEffect(() => {
+		axios
+			.get(`http://localhost:3030/${optionType}`)
+			.then((res) => {
+				setItems(res.data);
+				if (err) {
+					setErr(false);
+				}
+			})
+			.catch((err) => setErr(true));
+	}, [optionType, err]);
 
-    const ItemComponent = optionType === 'scoops' ? ScoopOption : ToppingOption;
+	if (err) return <AlertBanner />;
 
-    const optionItems = items.map(({name, imagePath}) => (
-    <ItemComponent key={name} name={name} imagePath={imagePath} />
-    ));
+	const ItemComponent = optionType === 'scoops' ? ScoopOption : ToppingOption;
 
-    const alertBanner = (
-        <Alert variant="danger">
-            An unexpected error occurred. Please try again later.
-        </Alert>
-    )
+	const title = optionType[0].toUpperCase() + optionType.slice(1).toLowerCase();
 
-    return (
-    <Row>
-        !err ? {optionItems} : {alertBanner}
-    </Row>);
-};
+	const optionItems = items.map(({ name, imagePath }) => (
+		<ItemComponent key={name} name={name} imagePath={imagePath} />
+	));
+
+	return (
+		<>
+			<h2>{title}</h2>
+			<p>{formatCurrency(pricePerItem[optionType])} each</p>
+			<p>
+				{title} total: {formatCurrency(totals[optionType])}
+			</p>
+			<Row>{optionItems}</Row>
+		</>
+	);
+}
